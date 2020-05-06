@@ -1076,6 +1076,8 @@ void AsmPrinter::EmitFunctionBody() {
     }
   }
 
+  const auto &SourceFileName = MF->getFunction().getParent()->getSourceFileName();
+
   // Print out code for the function.
   bool HasAnyRealCode = false;
   int NumInstsInFunction = 0;
@@ -1083,6 +1085,20 @@ void AsmPrinter::EmitFunctionBody() {
     // Print a label for the basic block.
     EmitBasicBlockStart(MBB);
     for (auto &MI : MBB) {
+
+      // Print the source location corresponding to the instruction.
+      if (!MI.isPosition() && !MI.isImplicitDef() && !MI.isKill() &&
+          !MI.isDebugInstr()) {
+        const DebugLoc &DL = MI.getDebugLoc();
+        if (DL) {
+          unsigned Line = DL.getLine();
+          unsigned Col = DL.getCol();
+          printf("%s:%u:%u", SourceFileName.c_str(), Line, Col);
+        } else {
+          printf("%s:-:-", SourceFileName.c_str());
+        }
+      }
+
       // Print the assembly for the instruction.
       if (!MI.isPosition() && !MI.isImplicitDef() && !MI.isKill() &&
           !MI.isDebugInstr()) {
@@ -1156,6 +1172,12 @@ void AsmPrinter::EmitFunctionBody() {
                              TimePassesIsEnabled);
           HI.Handler->endInstruction();
         }
+      }
+
+      // Terminate the output.
+      if (!MI.isPosition() && !MI.isImplicitDef() && !MI.isKill() &&
+          !MI.isDebugInstr()) {
+        printf("\n");
       }
     }
 

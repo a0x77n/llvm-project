@@ -53,6 +53,17 @@ X86AsmPrinter::X86AsmPrinter(TargetMachine &TM,
 /// runOnMachineFunction - Emit the function body.
 ///
 bool X86AsmPrinter::runOnMachineFunction(MachineFunction &MF) {
+  const auto &Func = MF.getFunction();
+  const char *Fname;
+
+  // Print the name of the current function.
+  if (Func.hasName()) {
+    Fname = MF.getName().data();
+  } else {
+    Fname = "unknown";
+  }
+  printf("%s\n", Fname);
+
   Subtarget = &MF.getSubtarget<X86Subtarget>();
 
   SMShadowTracker.startFunction(MF);
