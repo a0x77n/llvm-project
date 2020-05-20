@@ -895,7 +895,7 @@ raw_ostream &llvm::nulls() {
 raw_ostream &warnminer::outs() {
   // Set buffer settings to model stdout behavior.
   std::error_code EC;
-  static raw_fd_ostream S("/tmp/warnminer.out", EC, sys::fs::OF_None);
+  static raw_fd_ostream S("/tmp/warnminer.out", EC, sys::fs::OF_Append);
   assert(!EC);
   return S;
 }
