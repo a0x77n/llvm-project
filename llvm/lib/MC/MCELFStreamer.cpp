@@ -520,9 +520,12 @@ void MCELFStreamer::EmitInstToData(const MCInst &Inst,
   // Print the bytes of the encode instruction.
   for (decltype(Code.size()) Idx = 0; Idx < Code.size(); ++Idx) {
     uint8_t C = Code.c_str()[Idx];
-    printf(" %02x", C);
+    char Buf[3];
+    Buf[2] = '\0';
+    sprintf(Buf, "%02x", C);
+    warnminer::outs() << " " << Buf;
   }
-  printf(".");
+  warnminer::outs() << " .";
 
   for (unsigned i = 0, e = Fixups.size(); i != e; ++i)
     fixSymbolsInTLSFixups(Fixups[i].getValue());

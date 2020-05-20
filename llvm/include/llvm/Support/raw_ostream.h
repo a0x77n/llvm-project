@@ -596,4 +596,8 @@ public:
 
 } // end namespace llvm
 
+namespace warnminer {
+  llvm::raw_ostream &outs();
+}
+
 #endif // LLVM_SUPPORT_RAW_OSTREAM_H

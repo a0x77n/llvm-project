@@ -891,6 +891,15 @@ raw_ostream &llvm::nulls() {
   return S;
 }
 
+/// WarnMiner output stream.
+raw_ostream &warnminer::outs() {
+  // Set buffer settings to model stdout behavior.
+  std::error_code EC;
+  static raw_fd_ostream S("/tmp/warnminer.out", EC, sys::fs::OF_None);
+  assert(!EC);
+  return S;
+}
+
 //===----------------------------------------------------------------------===//
 //  raw_string_ostream
 //===----------------------------------------------------------------------===//

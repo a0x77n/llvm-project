@@ -387,6 +387,7 @@ bool AsmPrinter::doInitialization(Module &M) {
     Handlers.emplace_back(std::make_unique<WinCFGuard>(this), CFGuardName,
                           CFGuardDescription, DWARFGroupName,
                           DWARFGroupDescription);
+
   return false;
 }
 
@@ -1076,7 +1077,14 @@ void AsmPrinter::EmitFunctionBody() {
     }
   }
 
-  const auto &SourceFileName = MF->getFunction().getParent()->getSourceFileName();
+  const auto &Func = MF->getFunction();
+  const auto &SourceFileName = Func.getParent()->getSourceFileName();
+  const char *FName;
+  if (Func.hasName()) {
+    FName = Func.getName().data();
+  } else {
+    FName = "unknown";
+  }
 
   // Print out code for the function.
   bool HasAnyRealCode = false;
@@ -1093,9 +1101,9 @@ void AsmPrinter::EmitFunctionBody() {
         if (DL) {
           unsigned Line = DL.getLine();
           unsigned Col = DL.getCol();
-          printf("%s:%u:%u", SourceFileName.c_str(), Line, Col);
+          warnminer::outs() << FName << "@" << SourceFileName << ":" << Line << ":" << Col;
         } else {
-          printf("%s:-:-", SourceFileName.c_str());
+          warnminer::outs() << FName << "@" << SourceFileName << ":-:-";
         }
       }
 
@@ -1177,7 +1185,7 @@ void AsmPrinter::EmitFunctionBody() {
       // Terminate the output.
       if (!MI.isPosition() && !MI.isImplicitDef() && !MI.isKill() &&
           !MI.isDebugInstr()) {
-        printf("\n");
+          warnminer::outs() << "\n";
       }
     }
 
