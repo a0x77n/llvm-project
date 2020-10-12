@@ -1077,15 +1077,6 @@ void AsmPrinter::EmitFunctionBody() {
     }
   }
 
-  const auto &Func = MF->getFunction();
-  const auto &SourceFileName = Func.getParent()->getSourceFileName();
-  const char *FName;
-  if (Func.hasName()) {
-    FName = Func.getName().data();
-  } else {
-    FName = "unknown";
-  }
-
   // Print out code for the function.
   bool HasAnyRealCode = false;
   int NumInstsInFunction = 0;
@@ -1094,16 +1085,18 @@ void AsmPrinter::EmitFunctionBody() {
     EmitBasicBlockStart(MBB);
     for (auto &MI : MBB) {
 
+      OutStreamer->WarnMinerLine = "";
+      raw_svector_ostream WarnMinerOS(OutStreamer->WarnMinerLine);
+
       // Print the source location corresponding to the instruction.
       if (!MI.isPosition() && !MI.isImplicitDef() && !MI.isKill() &&
           !MI.isDebugInstr()) {
         const DebugLoc &DL = MI.getDebugLoc();
         if (DL) {
-          unsigned Line = DL.getLine();
-          unsigned Col = DL.getCol();
-          warnminer::outs() << FName << "@" << SourceFileName << ":" << Line << ":" << Col;
+          DL.print(WarnMinerOS);
         } else {
-          warnminer::outs() << FName << "@" << SourceFileName << ":-:-";
+          WarnMinerOS << MF->getFunction().getParent()->getSourceFileName()
+                            << ":-:-";
         }
       }
 
@@ -1185,7 +1178,7 @@ void AsmPrinter::EmitFunctionBody() {
       // Terminate the output.
       if (!MI.isPosition() && !MI.isImplicitDef() && !MI.isKill() &&
           !MI.isDebugInstr()) {
-          warnminer::outs() << "\n";
+          warnminer::outs() << OutStreamer->WarnMinerLine << "\n";
       }
     }
 

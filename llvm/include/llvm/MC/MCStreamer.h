@@ -248,6 +248,9 @@ protected:
   bool checkCVLocSection(unsigned FuncId, unsigned FileNo, SMLoc Loc);
 
 public:
+
+  SmallString<256> WarnMinerLine;
+
   MCStreamer(const MCStreamer &) = delete;
   MCStreamer &operator=(const MCStreamer &) = delete;
   virtual ~MCStreamer();
